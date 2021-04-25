@@ -1,1 +1,5 @@
-test
+- githubにレポジトリを作る
+- docsフォルダを作る
+- docsフォルダにhtmlファイルを格納する
+- すると、「https://axjack.github.io/＜レポジトリ名＞/＜htmlファイル名＞」でブラウザから閲覧することができる。
+- 今回の場合は「https://axjack.github.io/bike_rental_predict_with_prophet/bikerental_timeseries.nb.html」となる
