@@ -1,0 +1,79 @@
+---
+title: "Rを使って時系列予測"
+output: html_notebook
+---
+
+
+
+## データの出典
+
+| key | value |
+| ---- | ---- | 
+| タイトル |  チュートリアル:自動機械学習を使用して需要を予測する |
+| URL | https://docs.microsoft.com/ja-jp/azure/machine-learning/tutorial-automated-ml-forecast |
+| URL(実際のデータ) | https://raw.githubusercontent.com/Azure/MachineLearningNotebooks/master/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/bike-no.csv |
+| URL(データの詳細) | https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset  |   
+
+## 時系列予測で使うもの
+Facebookが開発した[prophet](https://facebook.github.io/prophet/)というライブラリです。
+
+## prophet で必要となる列
+
+ | 列名 | 意味 |
+ | ---- | ---- |
+ | ds   | タイムスタンプです。 |
+ | y    | 予測に用いる訓練用の値です。 |
+ 
+
+
+## 使用するライブラリの読み込み
+
+```{r message=FALSE}
+library(tidyverse)
+library(lubridate)
+library(TSstudio)
+library(prophet)
+```
+
+## コーディング
+
+```{r}
+# URL
+filepath <- "https://raw.githubusercontent.com/Azure/MachineLearningNotebooks/master/how-to-use-azureml/automated-machine-learning/forecasting-bike-share/bike-no.csv"
+
+# データ読み込み
+bkrt <- read_csv(filepath)
+
+# 先頭行の表示
+bkrt %>% head()
+
+# 予測用にデータを整形
+bkrt %>% 
+  mutate(ds = mdy(date) ) %>% 
+  rename(y = cnt) %>% 
+  select(ds,y) -> df
+
+# 時系列プロット
+df %>% ts_plot()
+
+# 予測モデルの作成
+model <- prophet(df, yearly.seasonality = TRUE, weekly.seasonality = TRUE)
+
+# 1年分の空データを作成
+future <- make_future_dataframe(model, 365)
+
+# モデルに1年分の空データを適用し、予測値を出す
+fore <- predict(model, future)
+
+# 予測値とともにプロット
+plot(model,fore)
+
+# トレンドの表示
+prophet_plot_components(model,fore)
+
+```
+
+
+
+
+
